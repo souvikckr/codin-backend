@@ -1,5 +1,5 @@
 const express = require('express');
-const { routes } = require('usermanagement');
+const { routes } = require('manage-users');
 
 const router = express.Router();
 

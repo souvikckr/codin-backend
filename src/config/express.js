@@ -4,7 +4,7 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const expressSession = require('express-session');
 const cookieParser = require('cookie-parser');
-const { config } = require('usermanagement');
+const { config } = require('manage-users');
 
 const { logs, session } = require('./vars');
 /* eslint-disable-next-line no-unused-vars */
@@ -36,8 +36,6 @@ app.use(expressSession(session));
 
 app.use(config.passport.initialize());
 app.use(config.passport.session());
-
-
 
 // mount api v1 routes
 app.use('/v1', routes);
