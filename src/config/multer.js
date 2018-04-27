@@ -27,6 +27,6 @@ module.exports = (req, res) => new Promise((resolve, reject) => {
         if (err) {
             return reject(err);
         }
-        return resolve();
+        return resolve(req.file);
     });
 });

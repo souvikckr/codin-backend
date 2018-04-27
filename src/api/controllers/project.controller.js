@@ -1,6 +1,14 @@
 const httpStatus = require('http-status');
+const zlib = require('zlib');
+const fs = require('fs');
+
 const multer = require('../../config/multer');
-const { addNewProject, addToUsersProjects } = require('../repository/mongo.repository');
+const {
+    addNewProject,
+    addToUsersProjects,
+    isUserAContributor,
+    addReportToProject,
+} = require('../repository/mongo.repository');
 const { handler: errorHandler } = require('../middlewares/error');
 
 /**
@@ -20,15 +28,26 @@ exports.register = async (req, res, next) => {
                 },
             };
             await addNewProject(project);
-            const x = await addToUsersProjects(req.user._id, project._id);
-            return res.status(httpStatus.OK).json({ message: 'registered', project, x });
+            // When the project is added successfully,
+            // It will have _id field in the object
+            await addToUsersProjects(req.user._id, project._id);
+            return res.status(httpStatus.OK).json({ message: 'registered', project });
         }
-        return res.status(httpStatus.UNAUTHORIZED).json({ message: 'not registered' });
+        return res.status(httpStatus.UNAUTHORIZED).json({ message: 'UNAUTHORIZED' });
     } catch (error) {
         return errorHandler(error, req, res);
     }
 };
 
+const uncompress = file => new Promise((resolve, reject) => {
+    const stream = fs.createReadStream(file.path);
+    const unzip = zlib.createGunzip();
+    stream.pipe(unzip);
+    let x = '';
+    unzip.on('data', (chunk) => { x += chunk; });
+    unzip.on('finish', () => { resolve(JSON.parse(x)); });
+    unzip.on('error', (err) => { reject(err); });
+});
 
 /**
  * Upload a report
@@ -37,10 +56,26 @@ exports.register = async (req, res, next) => {
 exports.upload = async (req, res, next) => {
     try {
         if (req.user) {
-            await multer(req, res);
-            return res.status(httpStatus.OK).json({ message: 'uploaded' });
+            const { projectID } = req.params;
+            const isUserAllowed = await isUserAContributor(req.user._id, projectID);
+            if (isUserAllowed) {
+                const file = await multer(req, res);
+                const json = await uncompress(file);
+                const report = {
+                    meta: {
+                        submitted_by: req.user._id,
+                        submitted_at: new Date().getTime(),
+                    },
+                    report: json,
+                };
+                await addReportToProject(projectID, report);
+                return res.status(httpStatus.OK).json({ message: 'UPLOADED' });
+            }
+            return res.status(httpStatus.BAD_REQUEST).json({
+                message: 'NOT A CONTRIBUTOR',
+            });
         }
-        return res.status(httpStatus.UNAUTHORIZED).json({ message: 'not uploaded' });
+        return res.status(httpStatus.UNAUTHORIZED).json({ message: 'UNAUTHORIZED' });
     } catch (error) {
         return errorHandler(error, req, res);
     }

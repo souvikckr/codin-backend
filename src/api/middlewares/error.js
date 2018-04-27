@@ -9,7 +9,7 @@ const { env } = require('../../config/vars');
  */
 const handler = (err, req, res, next) => {
     const response = {
-        code: err.status,
+        code: err.status || httpStatus.INTERNAL_SERVER_ERROR,
         message: err.message || httpStatus[err.status],
         errors: err.errors,
         stack: err.stack,
@@ -36,13 +36,13 @@ exports.converter = (err, req, res, next) => {
         convertedError = new APIError({
             message: 'Validation Error',
             errors: err.errors,
-            status: err.status,
+            status: err.status || httpStatus.INTERNAL_SERVER_ERROR,
             stack: err.stack,
         });
     } else if (!(err instanceof APIError)) {
         convertedError = new APIError({
             message: err.message,
-            status: err.status,
+            status: err.status || httpStatus.INTERNAL_SERVER_ERROR,
             stack: err.stack,
         });
     }
