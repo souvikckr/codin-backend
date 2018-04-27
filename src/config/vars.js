@@ -14,14 +14,14 @@ module.exports = {
         incoming: 'report',
     },
     session: {
-        secret: 'q1W@e3R$t5',
+        secret: process.env.SESSION_SECRET,
         resave: false,
         saveUninitialized: true,
     },
     database: {
-        uri: 'mongodb://localhost:27017/codin_local',
-        database: 'codin_local',
-        userCollection: 'user',
-        projectCollection: 'project',
+        uri: process.env.DB_URI,
+        database: process.env.DB_DB_NAME,
+        userCollection: process.env.DB_USER_COLLECTION,
+        projectCollection: process.env.DB_PROJECT_COLLECTION,
     },
 };
