@@ -14,4 +14,12 @@ module.exports = {
             name: Joi.string().required(),
         },
     },
+
+    // POST /v1/project/contributor
+    contributor: {
+        body: {
+            contributorID: Joi.string().required(),
+            projectID: Joi.string().required(),
+        },
+    },
 };

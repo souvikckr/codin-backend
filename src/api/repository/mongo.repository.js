@@ -48,14 +48,28 @@ const addToUsersProjects = (userID, projectID) => new Promise(async (resolve, re
     if (!db) {
         await connect();
     }
+    const update = {
+        $addToSet: { projects: new ObjectId(projectID) },
+    };
     db.collection(database.userCollection)
-        .updateOne(
-            { _id: new ObjectId(userID) },
-            { $addToSet: { projects: new ObjectId(projectID) } },
-        )
+        .updateOne({ _id: new ObjectId(userID) }, update)
         .then(resolve)
         .catch(reject);
 });
+
+const addToProjectsContributor = (projectID, contributorID) =>
+    new Promise(async (resolve, reject) => {
+        if (!db) {
+            await connect();
+        }
+        const update = {
+            $addToSet: { contributors: new ObjectId(contributorID) },
+        };
+        db.collection(database.projectCollection)
+            .updateOne({ _id: new ObjectId(projectID) }, update)
+            .then(resolve)
+            .catch(reject);
+    });
 
 const isUserAContributor = (userID, projectID) => new Promise(async (resolve, reject) => {
     if (!db) {
@@ -99,4 +113,5 @@ module.exports = {
     isUserAContributor,
     addReportToProject,
     getUsersProjects,
+    addToProjectsContributor,
 };
