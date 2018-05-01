@@ -9,6 +9,7 @@ const {
     addToUsersProjects,
     isUserAContributor,
     addReportToProject,
+    addToProjectsContributor,
 } = require('../repository/mongo.repository');
 const { handler: errorHandler } = require('../middlewares/error');
 
@@ -71,6 +72,34 @@ exports.upload = async (req, res, next) => {
                 };
                 await addReportToProject(projectID, report);
                 return res.status(httpStatus.OK).json({ message: 'UPLOADED' });
+            }
+            return res.status(httpStatus.BAD_REQUEST).json({
+                message: 'NOT A CONTRIBUTOR',
+            });
+        }
+        return res.status(httpStatus.UNAUTHORIZED).json({ message: 'UNAUTHORIZED' });
+    } catch (error) {
+        return errorHandler(error, req, res);
+    }
+};
+
+
+/**
+ * Upload a report
+ * @public
+ */
+exports.contributor = async (req, res, next) => {
+    try {
+        if (req.user) {
+            const { contributorID } = req.body;
+            const { projectID } = req.body;
+            const isUserAllowed = await isUserAContributor(req.user._id, projectID);
+            if (isUserAllowed) {
+                await addToUsersProjects(contributorID, projectID);
+                await addToProjectsContributor(projectID, contributorID);
+                return res.status(httpStatus.OK).json({
+                    message: 'SUCCESS',
+                });
             }
             return res.status(httpStatus.BAD_REQUEST).json({
                 message: 'NOT A CONTRIBUTOR',
