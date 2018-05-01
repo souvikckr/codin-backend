@@ -49,7 +49,10 @@ const addToUsersProjects = (userID, projectID) => new Promise(async (resolve, re
         await connect();
     }
     db.collection(database.userCollection)
-        .updateOne({ _id: new ObjectId(userID) }, { $addToSet: { projects: projectID } })
+        .updateOne(
+            { _id: new ObjectId(userID) },
+            { $addToSet: { projects: new ObjectId(projectID) } },
+        )
         .then(resolve)
         .catch(reject);
 });
@@ -77,75 +80,23 @@ const addReportToProject = (projectID, json) => new Promise(async (resolve, reje
         .catch(reject);
 });
 
+const getUsersProjects = userID => new Promise(async (resolve, reject) => {
+    if (!db) {
+        await connect();
+    }
+    db.collection(database.projectCollection)
+        .find({ contributors: new ObjectId(userID) })
+        .project({ name: 1, created_by: 1 })
+        .toArray()
+        .then(resolve)
+        .catch(reject);
+});
+
 module.exports = {
-    connect, addNewProject, addToUsersProjects, isUserAContributor, addReportToProject,
+    connect,
+    addNewProject,
+    addToUsersProjects,
+    isUserAContributor,
+    addReportToProject,
+    getUsersProjects,
 };
-
-// /**
-//  * Takes the key and checks whether there are any users in the
-//  * repository against passed key.
-//  * @param {string} key
-//  * @returns {Promise} A promise that will be resolved to true in case the user exists
-//  */
-// const exists = key => new Promise(async (resolve, reject) => {
-//     // For some reason, the database connection has failed, then re-try
-//     // This might lead to un-responsive system if the connection is broken
-//     if (!db) {
-//         await connect();
-//     }
-//     const repoSchema = repositorySchema.get();
-//     const query = {
-//         [userSchema.get().keyField.name]: key,
-//     };
-//     db.collection(repoSchema.collection).find(query).toArray((err, result) => {
-//         if (err) return reject(err);
-//         return resolve(result.length > 0);
-//     });
-// });
-
-// /**
-//  * Takes the user object passed and saves it to the repository
-//  * @param {*} object
-//  * @returns {Promise} A Promise that will be resolved to the output from repository operation
-//  */
-// const create = object => new Promise(async (resolve, reject) => {
-//     if (!db) {
-//         await connect();
-//     }
-//     const repoSchema = repositorySchema.get();
-//     db.collection(repoSchema.collection).insertOne(object).then(resolve).catch(reject);
-// });
-
-
-// /**
-//  * Takes the userobject with key and password field and checks for the matching entry
-//  * in the repository
-//  * @param {*} user
-//  * @returns {Promise} A Promise that will get resolved to the output repository operation
-//  */
-// const find = ({ key }) => new Promise(async (resolve, reject) => {
-//     if (!db) {
-//         await connect();
-//     }
-//     const repoSchema = repositorySchema.get();
-//     const query = {
-//         [userSchema.get().keyField.name]: key,
-//     };
-//     db.collection(repoSchema.collection).findOne(query).then(resolve).catch(reject);
-// });
-
-
-// const update = (key, updates) => new Promise(async (resolve, reject) => {
-//     if (!db) {
-//         await connect();
-//     }
-//     const query = {
-//         [userSchema.get().keyField.name]: key,
-//     };
-//     const set = {
-//         $set: updates,
-//     };
-//     const repoSchema = repositorySchema.get();
-//     db.collection(repoSchema.collection).updateOne(query, set).then(resolve).catch(reject);
-// });
-

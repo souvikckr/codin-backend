@@ -1,15 +1,22 @@
 const httpStatus = require('http-status');
 
-
+const {
+    getUsersProjects,
+} = require('../repository/mongo.repository');
 const { handler: errorHandler } = require('../middlewares/error');
 
+
 /**
- * Upload a report
+ * Gets the list of the projects of user
  * @public
  */
-exports.upload = (req, res, next) => {
+exports.project = async (req, res, next) => {
     try {
-        return res.status(httpStatus.OK).json({ message: 'uploaded' });
+        if (req.user) {
+            const projects = await getUsersProjects(req.user._id);
+            return res.status(httpStatus.OK).json(projects);
+        }
+        return res.status(httpStatus.UNAUTHORIZED).json({ message: 'UNAUTHORIZED' });
     } catch (error) {
         return errorHandler(error, req, res);
     }

@@ -1,6 +1,7 @@
 const httpStatus = require('http-status');
 const zlib = require('zlib');
 const fs = require('fs');
+const { ObjectId } = require('mongodb');
 
 const multer = require('../../config/multer');
 const {
@@ -20,8 +21,8 @@ exports.register = async (req, res, next) => {
         if (req.user) {
             const project = {
                 name: req.body.name,
-                created_by: req.user._id,
-                contributors: [req.user._id],
+                created_by: new ObjectId(req.user._id),
+                contributors: [new ObjectId(req.user._id)],
                 meta: {
                     created_at: new Date().getTime(),
                     updated_at: 0,
@@ -31,7 +32,7 @@ exports.register = async (req, res, next) => {
             // When the project is added successfully,
             // It will have _id field in the object
             await addToUsersProjects(req.user._id, project._id);
-            return res.status(httpStatus.OK).json({ message: 'registered', project });
+            return res.status(httpStatus.OK).json({ message: 'REGISTERED', project });
         }
         return res.status(httpStatus.UNAUTHORIZED).json({ message: 'UNAUTHORIZED' });
     } catch (error) {
