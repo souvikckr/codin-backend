@@ -11,11 +11,14 @@ router
 
 router
     .route('/login')
-    .post(routes.login(), (req, res, next) => {
-        res.json(req.user);
-    });
+    .post(routes.login(), controller.login);
+
+
+router.route('/logout')
+    .all(controller.logout);
 
 router.route('/project')
     .get(controller.project);
+
 
 module.exports = router;

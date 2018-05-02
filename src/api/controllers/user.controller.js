@@ -5,6 +5,24 @@ const {
 } = require('../repository/mongo.repository');
 const { handler: errorHandler } = require('../middlewares/error');
 
+/**
+ * Called AFTER the successful login of the user
+ */
+exports.login = (req, res, next) => {
+    const user = Object.assign({}, req.user);
+    // Might want to remove some fields off the user.
+    res.json(user);
+};
+
+/**
+ * Used to clears session and req.user object using passport's req.logout()
+ */
+exports.logout = (req, res, next) => {
+    // Passport adds a method logout to the req object.
+    // Which will clear session as well as req.user object
+    req.logout();
+    res.status(httpStatus.OK).json({ message: 'LOGGED_OUT' });
+};
 
 /**
  * Gets the list of the projects of user
