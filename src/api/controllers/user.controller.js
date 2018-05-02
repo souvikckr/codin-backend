@@ -2,6 +2,7 @@ const httpStatus = require('http-status');
 
 const {
     getUsersProjects,
+    getUserSuggestions,
 } = require('../repository/mongo.repository');
 const { handler: errorHandler } = require('../middlewares/error');
 
@@ -33,6 +34,24 @@ exports.project = async (req, res, next) => {
         if (req.user) {
             const projects = await getUsersProjects(req.user._id);
             return res.status(httpStatus.OK).json(projects);
+        }
+        return res.status(httpStatus.UNAUTHORIZED).json({ message: 'UNAUTHORIZED' });
+    } catch (error) {
+        return errorHandler(error, req, res);
+    }
+};
+
+
+/**
+ * Gets the suggestions list for given email
+ * @public
+ */
+exports.suggestions = async (req, res, next) => {
+    try {
+        if (req.user) {
+            const { query } = req.params;
+            const suggestions = await getUserSuggestions(query);
+            return res.status(httpStatus.OK).json({ suggestions });
         }
         return res.status(httpStatus.UNAUTHORIZED).json({ message: 'UNAUTHORIZED' });
     } catch (error) {
