@@ -15,7 +15,6 @@ router
     .route('/login')
     .post(routes.login(), controller.login);
 
-
 router.route('/logout')
     .all(controller.logout);
 
@@ -24,5 +23,9 @@ router.route('/project')
 
 router.route('/suggestions/:query')
     .get(validate(suggestions), controller.suggestions);
+
+
+router.route('/me')
+    .get(controller.me);
 
 module.exports = router;

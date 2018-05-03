@@ -58,3 +58,21 @@ exports.suggestions = async (req, res, next) => {
         return errorHandler(error, req, res);
     }
 };
+
+/**
+ * Gets the basic information of user
+ * Email ID, Name, ID
+ * @public
+ */
+exports.me = (req, res, next) => {
+    try {
+        if (req.user) {
+            const user = Object.assign({}, req.user);
+            delete user.projects;
+            return res.status(httpStatus.OK).json(user);
+        }
+        return res.status(httpStatus.UNAUTHORIZED).json({ message: 'UNAUTHORIZED' });
+    } catch (error) {
+        return errorHandler(error, req, res);
+    }
+};
