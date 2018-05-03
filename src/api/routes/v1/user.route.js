@@ -2,19 +2,18 @@ const express = require('express');
 const validate = require('express-validation');
 const { routes } = require('manage-users');
 
-const { suggestions } = require('../../validations/user.validation');
+const { suggestions, signup } = require('../../validations/user.validation');
 const controller = require('../../controllers/user.controller');
 
 const router = express.Router();
 
 router
     .route('/signup')
-    .post(routes.signup());
+    .post(validate(signup), routes.signup());
 
 router
     .route('/login')
     .post(routes.login(), controller.login);
-
 
 router.route('/logout')
     .all(controller.logout);
@@ -24,5 +23,8 @@ router.route('/project')
 
 router.route('/suggestions/:query')
     .get(validate(suggestions), controller.suggestions);
+
+router.route('/me')
+    .get(controller.me);
 
 module.exports = router;

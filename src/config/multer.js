@@ -4,7 +4,10 @@ const { uploads } = require('./vars');
 const storage = multer.diskStorage({
     destination: uploads.path,
     filename: (req, file, cb) => {
-        cb(null, file.originalname);
+        const timestamp = new Date().getTime();
+        const { _id } = req.user;
+        const fileName = `${_id}##${timestamp}##${file.originalname}`;
+        cb(null, fileName);
     },
 });
 
