@@ -2,7 +2,9 @@ const httpStatus = require('http-status');
 const zlib = require('zlib');
 const fs = require('fs');
 const { ObjectId } = require('mongodb');
+const path = require('path');
 
+const logger = require('../utils/logger');
 const multer = require('../../config/multer');
 const {
     addNewProject,
@@ -72,6 +74,13 @@ exports.upload = async (req, res, next) => {
                 };
                 await addReportToProject(projectID, report);
                 return res.status(httpStatus.OK).json({ message: 'UPLOADED' });
+                // TODO: Delete the file
+                fs.unlink(file, (err) => {
+                    if (err) {
+                        return logger.error(`Failed to delete '${path.basename(file)}'. ${JSON.stringify(err)}`);
+                    }
+                    return logger.error(`Successfully detelted '${path.basename(file)}'.`);
+                });
             }
             return res.status(httpStatus.BAD_REQUEST).json({
                 message: 'NOT A CONTRIBUTOR',
