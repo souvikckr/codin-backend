@@ -24,4 +24,20 @@ module.exports = {
         userCollection: process.env.DB_USER_COLLECTION,
         projectCollection: process.env.DB_PROJECT_COLLECTION,
     },
+    corsOptions: {
+        origin: (origin, callback) => {
+            const whiteList = [
+                '10.29.9.66',
+                '10.29.9.48',
+                'localhost',
+            ];
+            const index = whiteList.findIndex(anIP => origin.includes(anIP));
+            if (!origin || index !== -1) {
+                callback(null, true);
+            } else {
+                callback(new Error(`ORIGIN: '${origin}' Not allowed by CORS`));
+            }
+        },
+        credentials: true,
+    },
 };

@@ -1,8 +1,10 @@
 const Joi = require('joi');
 
 module.exports = {
-    // POST /v1/user/token
-    upload: {
-        body: {},
+    // GET /v1/user/suggestions
+    suggestions: {
+        params: {
+            query: Joi.string().min(2).required(),
+        },
     },
 };

@@ -106,6 +106,19 @@ const getUsersProjects = userID => new Promise(async (resolve, reject) => {
         .catch(reject);
 });
 
+
+const getUserSuggestions = query => new Promise(async (resolve, reject) => {
+    if (!db) {
+        await connect();
+    }
+    db.collection(database.userCollection)
+        .find({ email: { $regex: `${query}.*@.*` } })
+        .project({ name: 1, email: 1 })
+        .toArray()
+        .then(resolve)
+        .catch(reject);
+});
+
 module.exports = {
     connect,
     addNewProject,
@@ -114,4 +127,5 @@ module.exports = {
     addReportToProject,
     getUsersProjects,
     addToProjectsContributor,
+    getUserSuggestions,
 };

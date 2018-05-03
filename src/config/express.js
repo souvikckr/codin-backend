@@ -1,13 +1,13 @@
-const express = require("express");
-const compress = require("compression");
-const helmet = require("helmet");
-const morgan = require("morgan");
-const expressSession = require("express-session");
-const cors = require("cors");
-const cookieParser = require("cookie-parser");
-const { config } = require("manage-users");
+const express = require('express');
+const compress = require('compression');
+const helmet = require('helmet');
+const morgan = require('morgan');
+const expressSession = require('express-session');
+const cookieParser = require('cookie-parser');
+const cors = require('cors');
+const { config } = require('manage-users');
 
-const { logs, session } = require("./vars");
+const { logs, session, corsOptions } = require('./vars');
 /* eslint-disable-next-line no-unused-vars */
 const updatedConfig = require("./users")(config);
 const routes = require("../api/routes/v1");
@@ -34,6 +34,14 @@ app.use(compress());
 
 // secure apps by setting various HTTP headers
 app.use(helmet());
+
+// This middleware take care of the origin when the origin is undefined.
+// origin is undefined when request is local
+app.use((req, res, next) => {
+    req.headers.origin = req.headers.origin || req.headers.host;
+    next();
+});
+app.use(cors(corsOptions));
 
 app.use(cookieParser());
 app.use(expressSession(session));
