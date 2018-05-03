@@ -6,8 +6,7 @@ const storage = multer.diskStorage({
     filename: (req, file, cb) => {
         const timestamp = new Date().getTime();
         const { _id } = req.user;
-        const fileName = `${id}##${timestamp}##${file.originalname}`;
-        cosnole.log('Uploaded file name will be: ', fileName);
+        const fileName = `${_id}##${timestamp}##${file.originalname}`;
         cb(null, fileName);
     },
 });

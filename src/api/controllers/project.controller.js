@@ -43,6 +43,17 @@ exports.register = async (req, res, next) => {
     }
 };
 
+const unlink = file => new Promise((resolve) => {
+    fs.unlink(file.path, (err) => {
+        if (err) {
+            logger.error(`Failed to delete '${path.basename(file.path)}'. ${JSON.stringify(err)}`);
+        } else {
+            logger.info(`Deleted '${path.basename(file.path)}'.`);
+        }
+        resolve();
+    });
+});
+
 const uncompress = file => new Promise((resolve, reject) => {
     const stream = fs.createReadStream(file.path);
     const unzip = zlib.createGunzip();
@@ -73,14 +84,8 @@ exports.upload = async (req, res, next) => {
                     report: json,
                 };
                 await addReportToProject(projectID, report);
-                return res.status(httpStatus.OK).json({ message: 'UPLOADED' });
-                // TODO: Delete the file
-                fs.unlink(file, (err) => {
-                    if (err) {
-                        return logger.error(`Failed to delete '${path.basename(file)}'. ${JSON.stringify(err)}`);
-                    }
-                    return logger.error(`Successfully detelted '${path.basename(file)}'.`);
-                });
+                res.status(httpStatus.OK).json({ message: 'UPLOADED' });
+                return unlink(file);
             }
             return res.status(httpStatus.BAD_REQUEST).json({
                 message: 'NOT A CONTRIBUTOR',
