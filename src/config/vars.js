@@ -28,6 +28,7 @@ module.exports = {
         origin: (origin, callback) => {
             const whiteList = [
                 '10.29.9.66',
+                '10.29.9.61',
                 '10.29.9.48',
                 'localhost',
             ];
@@ -40,4 +41,8 @@ module.exports = {
         },
         credentials: true,
     },
+    role:{
+        admin: "Admin",
+        contributor: "Contributor"
+    }
 };

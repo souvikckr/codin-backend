@@ -2,7 +2,7 @@ const express = require('express');
 const validate = require('express-validation');
 
 const controller = require('../../controllers/project.controller');
-const { upload, register, contributor } = require('../../validations/project.validation');
+const { upload, register, contributor, getContributors } = require('../../validations/project.validation');
 const authenticated = require('../../middlewares/authenticated');
 
 const router = express.Router();
@@ -18,5 +18,9 @@ router
 router
     .route('/contributor')
     .post(validate(contributor), authenticated, controller.contributor);
+
+router
+    .route('/:projectID')
+    .get(controller.getContributors);
 
 module.exports = router;
